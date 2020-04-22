@@ -32,6 +32,7 @@ try {
     $action = isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'POST') ? 'send' : 'poll';
     switch($action) {
         case 'poll':
+           //GET NAME AND BACKGROUND COLOR FROM NAMETABLE
            $query = "SELECT * FROM chatlog WHERE date_created >= ".$lastPoll;
            $stmt = $db->prepare($query);
            $stmt->execute();
@@ -50,20 +51,44 @@ try {
             }
            $_SESSION['last_poll'] = $currentTime;
 
+           //SEND NAME ID AND BACKGROUND COLOR BACK
            print json_encode([
                 'success' => true,
 		        'messages' => $newChats
            ]);
            exit;
         case 'send':
-            $message = isset($_POST['message']) ? $_POST['message'] : '';            
-            $message = strip_tags($message);
-            $query = "INSERT INTO chatlog (message, sent_by, date_created) VALUES(?, ?, ?)";
-            $stmt = $db->prepare($query);
-            $stmt->bind_param('ssi', $message, $session_id, $currentTime); 
-            $stmt->execute(); 
-            print json_encode(['success' => true]);
-            exit;
+            if (isset($_POST['bg_color']))  //start screen
+            {
+                //insert into the table
+                $bg_color = strip_tags($_POST['bg_color']);
+                $name = strip_tags($_POST['name']);
+                $query = "INSERT INTO nametable (name, bg_color) VALUES(?, ?, ?)";
+                $stmt = $db->prepare($query);
+                $stmt->bind_param('ssi', $name, $bg_color);
+                $stmt->execute(); 
+
+                //GET NAME_ID
+                $query = "SELECT name_id FROM nametable WHERE name =".$name;
+                $stmt = $db->prepare($query);
+                $stmt->execute();
+                $stmt->bind_result($name_id);
+
+                //SEND NAME_ID AND SUCCESS BACK
+                print json_encode(['success' => true]);
+            }
+            else {  //send message
+                $name_id = isset($_POST['name_id']) ? $_POST['name_id'] : '';
+                $message = isset($_POST['message']) ? $_POST['message'] : '';            
+                $message = strip_tags($message);
+                $query = "INSERT INTO chatlog (name_id, message, sent_by, date_created) VALUES(?, ?, ?, ?)";
+                $stmt = $db->prepare($query);
+                $stmt->bind_param('ssi', $name_id, $message, $session_id, $currentTime); 
+                $stmt->execute(); 
+                print json_encode(['success' => true]);
+            }
+            
+            exit;            
     }
 } catch(Exception $e) {
     print json_encode([

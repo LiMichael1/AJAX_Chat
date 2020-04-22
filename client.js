@@ -5,7 +5,7 @@ var pollServer = function() {
             console.log("Error polling server for new messages!");
             return;
         }
-        
+        //ask for a name and background color back
         $.each(result.messages, function(idx) {
             
             var chatBubble;
@@ -40,6 +40,7 @@ $('#sendMessageBtn').on('click', function(event) {
     
     var message = $('#chatMessage').val();
     
+    //get name_id from client
     $.post('chat.php', {
         'message' : message
     }, function(result) {

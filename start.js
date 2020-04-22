@@ -11,8 +11,9 @@ $('#start').on('click', function(event) {
     setName();
 
     $.post('chat.php', {
-       'name': nickname 
-    }, function(result) {
+        'name': nickname,
+        'bg_color': generateRandomColor()
+    }, function(result) { //SENDS THE NAME ID BACK HERE 
         if(!result.success) {
             alert('It appears your nickname is taken');
             $('#nickname').val('');
@@ -23,6 +24,7 @@ $('#start').on('click', function(event) {
     });
 });
 
+//SET NAME ID INSTEAD
 function setName() {
     // need Error checking to see if nickname is set
     let cookieValue = escape($('#nickname').val()) + ';';
