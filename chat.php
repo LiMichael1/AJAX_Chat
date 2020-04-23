@@ -33,23 +33,17 @@ try {
     switch($action) {
         case 'poll':
             //GET NAME and BACKGROUND COLOR FROM NAMETABLE
-            $query = 'SELECT nametable.name, chatlog.message, nametable.bg_color, chatlog.sent_by
+            $query = 'SELECT nametable.name, chatlog.message, nametable.bg_color, nametable.id
                       FROM chatlog
                       JOIN nametable
                       ON chatlog.name_id = nametable.id
                       WHERE date_created >='.$lastPoll;
             $stmt = $db->prepare($query);
             $stmt->execute();
-            $stmt->bind_result($name, $message, $bg_color, $session_id);
+            $stmt->bind_result($name, $message, $bg_color, $name_id);
             $result = get_result( $stmt);
             $newChats = [];
-            while($chat = array_shift($result)) {    
-                if($session_id == $chat['sent_by']) {
-                    $chat['sent_by'] = 'self';
-                } else {
-                    $chat['sent_by'] = 'other';
-                }
-                
+            while($chat = array_shift($result)) {
                 $newChats[] = $chat;
             }
             $_SESSION['last_poll'] = $currentTime;

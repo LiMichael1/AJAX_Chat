@@ -4,12 +4,14 @@ var pollServer = function() {
             console.log("Error polling server for new messages!");
             return;
         }
+        console.log('getting');
         //ask for a name and background color back
         $.each(result.messages, function(idx) {
             console.log(this.name, this.message, this.bg_color);
+            console.log(this.id);
             var chatBubble;
             
-            if(this.sent_by == 'self') {
+            if(this.id == getName()) {
                 chatBubble = $(`<div style="--bg-color:${this.bg_color}" class="row bubble-sent pull-right"> 
                                 ${this.name} : ${this.message} 
                                 </div><div class="clearfix"></div>`);
@@ -28,21 +30,18 @@ var pollServer = function() {
 }
 
 $(document).on('ready', function() {
-    var startPoll = false;
-
     if(getName() === null) {
         $('.input-group').hide();
     } else {
         console.log('Name Id: ' + getName())
         $('.name-input').hide();
-        startPoll = true;
+        $('.bubble-recv').hide();
     }
 
     //Start Polling when name has been entered 
-    if(startPoll) {
-        console.log('Polling the Server');
-        pollServer();
-    }
+    console.log('Polling the Server');
+    pollServer();
+    
     
     $('button').click(function() {
         $(this).toggleClass('active');
@@ -54,7 +53,7 @@ $('#sendMessageBtn').on('click', function(event) {
     
     var message = $('#chatMessage').val();
 
-    //get name_id from client
+    // send message and name id to server 
     $.post('chat.php', {
         'message' : message,
         'name_id': getName()
