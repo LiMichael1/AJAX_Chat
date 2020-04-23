@@ -1,4 +1,4 @@
-if(getName() == '') {
+if(getName() === null) {
     $('.input-group').hide();
 } else {
     console.log(getName())
@@ -8,7 +8,9 @@ if(getName() == '') {
 
 $('#start').on('click', function(event) {
     event.preventDefault();
-    setName();
+
+    var nickname = $('#nickname').val();
+    console.log(nickname);
 
     $.post('chat.php', {
         'name': nickname,
@@ -18,6 +20,7 @@ $('#start').on('click', function(event) {
             alert('It appears your nickname is taken');
             $('#nickname').val('');
         } else {
+            setName(result.name_id);
             $('.name-input').hide();
             $('.input-group').show();
         }
@@ -25,29 +28,13 @@ $('#start').on('click', function(event) {
 });
 
 //SET NAME ID INSTEAD
-function setName() {
+function setName(name_id) {
     // need Error checking to see if nickname is set
-    let cookieValue = escape($('#nickname').val()) + ';';
-    let cookieString = "name=" + cookieValue;
-    let expire_date = new Date();
-    expire_date.setMonth( expire_date.getMonth() +1);
-    let expires = "expires=" + expire_date.toString() + ";";
-
-    cookieString += expires;
-    console.log(cookieString);
-    document.cookie = cookieString;
+    sessionStorage.setItem('name_id', name_id);
 }
 
 function getName() {
-    let cookieArray = document.cookie.split(';');
-    for(let i=0; i< cookieArray.length; i++)
-    {
-        key = cookieArray[i].split('=')[0];
-        if(key == 'name')
-            return cookieArray[i].split('=')[1];
-    }
-
-    return '';
+    return sessionStorage.getItem('name_id');
 }
 
 function generateRandomColor() {

@@ -1,26 +1,26 @@
 var pollServer = function() {
     $.get('chat.php', function(result) {
-        
         if(!result.success) {
             console.log("Error polling server for new messages!");
             return;
         }
         //ask for a name and background color back
         $.each(result.messages, function(idx) {
-            
+            console.log(this.name, this.message, this.bg_color);
             var chatBubble;
             
             if(this.sent_by == 'self') {
-                chatBubble = $('<div class="row bubble-sent pull-right">' + 
-                               this.message + 
-                               '</div><div class="clearfix"></div>');
+                chatBubble = $(`<div style="--bg-color:${this.bg_color}" class="row bubble-sent pull-right"> 
+                                ${this.name} : ${this.message} 
+                                </div><div class="clearfix"></div>`);
             } else {
-                chatBubble = $('<div class="row bubble-recv">' + 
-                               this.message + 
-                               '</div><div class="clearfix"></div>');
+                chatBubble = $(`<div style="--bg-color:${this.bg_color}" class="row bubble-recv"> 
+                                ${this.name} : ${this.message} 
+                                </div><div class="clearfix"></div>`);
             }
             
             $('#chatPanel').append(chatBubble);
+
         });
         
         setTimeout(pollServer, 5000);
@@ -39,19 +39,19 @@ $('#sendMessageBtn').on('click', function(event) {
     event.preventDefault();
     
     var message = $('#chatMessage').val();
-    
+
     //get name_id from client
     $.post('chat.php', {
-        'message' : message
+        'message' : message,
+        'name_id': getName()
     }, function(result) {
         
         $('#sendMessageBtn').toggleClass('active');
-        
-        
+    
         if(!result.success) {
             alert("There was an error sending your message");
         } else {
-            console.log("Message sent!");
+            console.log("Message sent: " + message);
             $('#chatMessage').val('');
         }
     });

@@ -32,50 +32,62 @@ try {
     $action = isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'POST') ? 'send' : 'poll';
     switch($action) {
         case 'poll':
-           //GET NAME AND BACKGROUND COLOR FROM NAMETABLE
-           $query = "SELECT * FROM chatlog WHERE date_created >= ".$lastPoll;
-           $stmt = $db->prepare($query);
-           $stmt->execute();
-           $stmt->bind_result($id, $message, $session_id, $date_created);
-           $result = get_result( $stmt);
-           $newChats = [];
-           while($chat = array_shift($result)) {
-               
-               if($session_id == $chat['sent_by']) {
-                  $chat['sent_by'] = 'self';
-               } else {
-                  $chat['sent_by'] = 'other';
-               }
-             
-               $newChats[] = $chat;
-            }
-           $_SESSION['last_poll'] = $currentTime;
+            //GET NAME AND BACKGROUND COLOR FROM NAMETABLE
 
-           //SEND NAME ID AND BACKGROUND COLOR BACK
-           print json_encode([
-                'success' => true,
-		        'messages' => $newChats
-           ]);
-           exit;
+            $query = 'SELECT nametable.name, chatlog.message, nametable.bg_color, chatlog.sent_by
+                      FROM chatlog
+                      JOIN nametable
+                      ON chatlog.name_id = nametable.id
+                      WHERE date_created >='.$lastPoll;
+            $stmt = $db->prepare($query);
+            $stmt->execute();
+            $stmt->bind_result($name, $message, $bg_color, $session_id);
+            // $stmt->bind_result($id, $message, $session_id, $date_created);
+            $result = get_result( $stmt);
+            $newChats = [];
+            while($chat = array_shift($result)) {    
+                if($session_id == $chat['sent_by']) {
+                    $chat['sent_by'] = 'self';
+                } else {
+                    $chat['sent_by'] = 'other';
+                }
+                
+                $newChats[] = $chat;
+            }
+            $_SESSION['last_poll'] = $currentTime;
+
+            //SEND NAME ID AND BACKGROUND COLOR BACK
+            print json_encode([
+                    'success' => true,
+                    'messages' => $newChats
+            ]);
+            exit;
         case 'send':
             if (isset($_POST['bg_color']))  //start screen
             {
                 //insert into the table
                 $bg_color = strip_tags($_POST['bg_color']);
                 $name = strip_tags($_POST['name']);
-                $query = "INSERT INTO nametable (name, bg_color) VALUES(?, ?, ?)";
+                $query = "INSERT INTO nametable (name, bg_color) VALUES(?, ?)";
                 $stmt = $db->prepare($query);
-                $stmt->bind_param('ssi', $name, $bg_color);
+                $stmt->bind_param('ss', $name, $bg_color);
                 $stmt->execute(); 
+                $stmt->close();
 
                 //GET NAME_ID
-                $query = "SELECT name_id FROM nametable WHERE name =".$name;
+                $query = "SELECT id FROM nametable WHERE name = '$name'";
                 $stmt = $db->prepare($query);
                 $stmt->execute();
-                $stmt->bind_result($name_id);
-
+                $stmt->bind_result($id);
+                while($stmt->fetch())
+                {
+                    $name_id = $id;
+                }
+                
                 //SEND NAME_ID AND SUCCESS BACK
-                print json_encode(['success' => true]);
+                print json_encode(['success' => true, 
+                                   'name_id' => $name_id]);
+                exit;
             }
             else {  //send message
                 $name_id = isset($_POST['name_id']) ? $_POST['name_id'] : '';
@@ -83,12 +95,11 @@ try {
                 $message = strip_tags($message);
                 $query = "INSERT INTO chatlog (name_id, message, sent_by, date_created) VALUES(?, ?, ?, ?)";
                 $stmt = $db->prepare($query);
-                $stmt->bind_param('ssi', $name_id, $message, $session_id, $currentTime); 
+                $stmt->bind_param('issi', $name_id, $message, $session_id, $currentTime); 
                 $stmt->execute(); 
                 print json_encode(['success' => true]);
+                exit;
             }
-            
-            exit;            
     }
 } catch(Exception $e) {
     print json_encode([

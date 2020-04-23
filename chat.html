@@ -11,7 +11,7 @@
               width: 330px;
               height: 75px;
               padding: 10px;
-              background: #AEE5FF;
+              background: var(--bg-color);
               -webkit-border-radius: 10px;
               -moz-border-radius: 10px;
               border-radius: 10px;
@@ -25,7 +25,7 @@
               position: absolute;
               border-style: solid;
               border-width: 15px 15px 15px 0;
-              border-color: transparent #AEE5FF;
+              border-color: transparent var(--bg-color);
               display: block;
               width: 0;
               z-index: 1;
@@ -39,7 +39,7 @@
               position: absolute;
               border-style: solid;
               border-width: 15px 15px 15px 0;
-              border-color: transparent #000000;
+              border-color: transparent var(--bg-color);
               display: block;
               width: 0;
               z-index: 0;
@@ -53,7 +53,7 @@
               width: 330px;
               height: 75px;
               padding: 10px;
-              background: #00E500;
+              background: var(--bg-color);
               -webkit-border-radius: 10px;
               -moz-border-radius: 10px;
               border-radius: 10px;
@@ -67,7 +67,7 @@
               position: absolute;
               border-style: solid;
               border-width: 15px 0 15px 15px;
-              border-color: transparent #00E500;
+              border-color: transparent var(--bg-color);
               display: block;
               width: 0;
               z-index: 1;
@@ -75,13 +75,14 @@
               top: 12px;
             }
             
+
             .bubble-sent:before 
             {
               content: '';
               position: absolute;
               border-style: solid;
               border-width: 15px 0 15px 15px;
-              border-color: transparent #000000;
+              border-color: transparent var(--bg-color);
               display: block;
               width: 0;
               z-index: 0;
@@ -174,7 +175,7 @@
     </div>    
 
     <script src="//code.jquery.com/jquery-2.2.3.min.js"></script>
-    <script src="stuff.js"></script>
+    <script src="start.js"></script>
     <script src="client.js"></script>
     </body>
 </html>
