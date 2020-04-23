@@ -32,8 +32,7 @@ try {
     $action = isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'POST') ? 'send' : 'poll';
     switch($action) {
         case 'poll':
-            //GET NAME AND BACKGROUND COLOR FROM NAMETABLE
-
+            //GET NAME and BACKGROUND COLOR FROM NAMETABLE
             $query = 'SELECT nametable.name, chatlog.message, nametable.bg_color, chatlog.sent_by
                       FROM chatlog
                       JOIN nametable
@@ -42,7 +41,6 @@ try {
             $stmt = $db->prepare($query);
             $stmt->execute();
             $stmt->bind_result($name, $message, $bg_color, $session_id);
-            // $stmt->bind_result($id, $message, $session_id, $date_created);
             $result = get_result( $stmt);
             $newChats = [];
             while($chat = array_shift($result)) {    
@@ -63,7 +61,7 @@ try {
             ]);
             exit;
         case 'send':
-            if (isset($_POST['bg_color']))  //start screen
+            if (isset($_POST['bg_color']))  //pressed START button?
             {
                 //insert into the table
                 $bg_color = strip_tags($_POST['bg_color']);

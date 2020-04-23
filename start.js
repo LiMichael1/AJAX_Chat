@@ -1,17 +1,16 @@
-if(getName() === null) {
-    $('.input-group').hide();
-} else {
-    console.log(getName())
-    $('.name-input').hide();
-}
+// if(getName() === null) {
+//     $('.input-group').hide();
+// } else {
+//     console.log(getName())
+//     $('.name-input').hide();
+// }
 
 
 $('#start').on('click', function(event) {
     event.preventDefault();
 
     var nickname = $('#nickname').val();
-    console.log(nickname);
-
+    
     $.post('chat.php', {
         'name': nickname,
         'bg_color': generateRandomColor()

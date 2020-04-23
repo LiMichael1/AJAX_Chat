@@ -28,7 +28,21 @@ var pollServer = function() {
 }
 
 $(document).on('ready', function() {
-    pollServer();
+    var startPoll = false;
+
+    if(getName() === null) {
+        $('.input-group').hide();
+    } else {
+        console.log('Name Id: ' + getName())
+        $('.name-input').hide();
+        startPoll = true;
+    }
+
+    //Start Polling when name has been entered 
+    if(startPoll) {
+        console.log('Polling the Server');
+        pollServer();
+    }
     
     $('button').click(function() {
         $(this).toggleClass('active');
